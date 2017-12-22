@@ -62,5 +62,38 @@ class Reservation(db.Model):
         self.card_number = card_number
         self.billing_address = billing_address
 
+class SeatsFree(db.Model):
+    """
+    Table that stores reservations
+    """
+    __tablename__ = 'seats_free'
+    train_id = db.Column(db.Integer, nullable=False, primary_key = True, db.ForeignKey('trains.train_id'))
+    segment_id = db.Column(db.Integer, nullable=False, primary_key = True, db.ForeignKey('segments.segment_id'))
+    seat_free_date = db.Column(db.Date, nullable=False)
+    freeseat = db.Column(db.Integer, nullable=False, default=448)
+    
+    
+
+    def __init__(self,train_id,segment_id,seat_free_date,billing_address):
+        self.reservation_date = reservation_date
+        self.paying_passenger_id = paying_passenger_id
+        self.card_number = card_number
+        self.billing_address = billing_address
+
+class Segment(db.Model):
+    """
+    Table that stores reservations
+    """
+    __tablename__ = 'segments'
+    segment_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
+    seg_n_end = db.Column(db.Integer, nullable=False, db.ForeignKey('stations.station_id'))
+    seg_s_end = db.Column(db.Integer, nullable=False, db.ForeignKey('stations.station_id'))
+    seg_fare = db.Column(db.Numeric(7,2), nullable=False)
+
+    def __init__(self,seg_n_end,seg_s_end,seg_fare):
+        self.seg_n_end = reservation_date
+        self.seg_s_end = paying_passenger_id
+        self.seg_fare = card_number
+
 
         
