@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from sqlalchemy import desc
+from werkzeug import generate_password_hash, check_password_hash
 from flask import session
 
 db = SQLAlchemy()
@@ -39,9 +40,11 @@ class Passenger(db.Model):
         self.fname = fname
         self.lname = lname
         self.email = email
-        self.password = password
+        self.password = generate_password_hash(password)
         self.preferred_card_number = preferred_card_number
         self.preferred_billing_address = preferred_billing_address
+
+    
 
 
 class Reservation(db.Model):
@@ -102,8 +105,8 @@ class Trains(db.Model):
     """
     __tablename__ = "trains"
     train_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
-    train_start = db.Column(db.Integer, nullable=False, db.ForeignKey("stations.station_id"))
-    train_end = db.Column(db.Integer, nullable=False, db.ForeignKey("stations.station_id"))
+    train_start = db.Column(db.Integer, db.ForeignKey("stations.station_id"), nullable=False)
+    train_end = db.Column(db.Integer, db.ForeignKey("stations.station_id"), nullable=False)
     train_direction = db.Column(db.Integer, default=None)
     train_days = db.Column(db.Integer, default=None)
 
@@ -120,12 +123,12 @@ class Trips(db.Model):
     __tablename__ = "trips"
     trip_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     trip_date = db.Column(db.Date, nullable=False)
-    trip_seg_start = db.Column(db.Integer, nullable=False, db.ForeignKey("segments.segment_id"))
-    trip_seg_ends = db.Column(db.Integer, nullable=False, db.ForeignKey("segments.segment_id"))
-    fare_type = db.Column(db.Integer, nullable=False, db.ForeignKey("fare_types.fare_id"))
+    trip_seg_start = db.Column(db.Integer, db.ForeignKey("segments.segment_id"), nullable=False)
+    trip_seg_ends = db.Column(db.Integer, db.ForeignKey("segments.segment_id"), nullable=False)
+    fare_type = db.Column(db.Integer, db.ForeignKey("fare_types.fare_id"), nullable=False)
     fare = db.Column(db.Numeric(7,2), nullable=False)
-    trip_train_id = db.Column(db.Integer, nullable=False, db.ForeignKey("trains.train_id"))
-    reservation_id = db.Column(db.Integer, nullable=False, db.ForeignKey("reservations.reservation_id"))
+    trip_train_id = db.Column(db.Integer, db.ForeignKey("trains.train_id"), nullable=False)
+    reservation_id = db.Column(db.Integer, db.ForeignKey("reservations.reservation_id"), nullable=False)
 
     def __init__(self, trip_date, trip_seg_start, trip_seg_ends, fare_type, fare, trip_train_id, reservation_id):
         self.trip_date = trip_date

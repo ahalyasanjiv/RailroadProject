@@ -9,6 +9,6 @@ from rrapp.models import db
 
 app = Flask(__name__)       
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/railroad'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/rrapp'
 
 import rrapp.routes
