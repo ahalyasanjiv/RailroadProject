@@ -131590,7 +131590,14 @@ ALTER TABLE fare_types
   ALTER COLUMN fare_id SET DEFAULT NEXTVAL('fare_types_seq');
 
 ALTER TABLE passengers
-  MODIFY passenger_id cast(11 as int) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  ALTER COLUMN passenger_id SET NOT NULL;
+
+CREATE SEQUENCE passengers_seq OWNED BY passengers.passenger_id;
+
+ALTER TABLE passengers
+  ALTER COLUMN passenger_id SET DEFAULT NEXTVAL('passengers_seq');
+
+CREATE SEQUENCE reservations_seq OWNED BY reservations.reservation_id;
 
 ALTER TABLE reservations
   ALTER COLUMN reservation_id SET NOT NULL;
