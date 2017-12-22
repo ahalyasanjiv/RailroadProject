@@ -136,8 +136,6 @@ class Trips(db.Model):
         self.trip_train_id = trip_train_id
         self.reservation_id = reservation_id
 
-
-
 class Station(db.Model):
     """
     Table that stores stations.
