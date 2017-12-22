@@ -46,8 +46,9 @@ def login():
 	if request.method == 'GET':
 		return render_template('login.html',form=form)
 	else:
-		if form.validate():
-			email = form.email.data
-			password = form.password.data
-			passenger = Passenger.query.filter_by(email=email).first()
+		return render_template('login.html',form=form)
+		# if form.validate():
+		# 	email = form.email.data
+		# 	password = form.password.data
+		# 	passenger = Passenger.query.filter_by(email=email).first()
     		
