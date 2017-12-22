@@ -92,9 +92,9 @@ class Segment(db.Model):
     seg_fare = db.Column(db.Numeric(7,2), nullable=False)
 
     def __init__(self,seg_n_end,seg_s_end,seg_fare):
-        self.seg_n_end = reservation_date
-        self.seg_s_end = paying_passenger_id
-        self.seg_fare = card_number
+        self.seg_n_end = seg_n_end
+        self.seg_s_end = seg_s_end
+        self.seg_fare = seg_fare
 
 
 
