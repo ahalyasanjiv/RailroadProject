@@ -139,6 +139,33 @@ class Trips(db.Model):
         self.trip_train_id = trip_train_id
         self.reservation_id = reservation_id
 
+class Station(db.Model):
+    """
+    Table that stores stations.
+    """
+    __tablename__ = 'stations'
+    station_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    station_name = db.Column(db.String(40), nullable=False)
+    station_symbol = db.Column(db.String(3), nullable=False, unique=True)
 
+    def __init__(self, station_name, station_symbol):
+        self.station_name = station_name
+        self.station_symbol = station_symbol
 
-        
+class StopsAt(db.Model):
+    """
+    Stops at table.
+    """
+
+    __tablename__= 'stops_at'
+    train_id = db.Column(db.Integer, nullable=False, primary_key=True, db.ForeignKey('trains.train_id'))
+    station_id = db.Column(db.Integer, nullable=False, primary_key=True, db.ForeignKey('stations.station_id'))
+    time_in = db.Column(db.Time)
+    time_out = db.Column(db.Time)
+
+    def __init__(self, train_id, station_id, time_in, time_out):
+        self.train_id = train_id
+        self.station_id = station_id
+        self.time_in = time_in
+        self.time_out = time_out
+
