@@ -10,7 +10,7 @@ class FareType(db.Model):
     Table that stores types of fares
     """
     __tablename__ = 'fare_types'
-    fare_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
+    fare_id = db.Column(db.Integer, nullable=False, primary_key = True)
     fare_name = db.Column(db.String(20))
     rate = db.Column(db.Numeric(3,2))
     
@@ -25,7 +25,7 @@ class Passenger(db.Model):
     Table that stores passengers
     """
     __tablename__ = 'passengers'
-    passenger_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
+    passenger_id = db.Column(db.Integer, nullable=False, primary_key = True)
     fname = db.Column(db.String(30))
     lname = db.Column(db.String(100))
     email = db.Column(db.String(100))
@@ -49,7 +49,7 @@ class Reservation(db.Model):
     Table that stores reservations
     """
     __tablename__ = 'reservations'
-    reservation_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
+    reservation_id = db.Column(db.Integer, nullable=False, primary_key = True)
     reservation_date = db.Column(db.DateTime(timezone=False), default=func.now())
     paying_passenger_id = db.Column(db.Integer, db.ForeignKey('passengers.passenger_id'), nullable=False)
     card_number = db.Column(db.String(16))
@@ -86,7 +86,7 @@ class Segment(db.Model):
     Table that stores reservations
     """
     __tablename__ = 'segments'
-    segment_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
+    segment_id = db.Column(db.Integer, nullable=False, primary_key = True)
     seg_n_end = db.Column(db.Integer, db.ForeignKey('stations.station_id'), nullable=False)
     seg_s_end = db.Column(db.Integer, db.ForeignKey('stations.station_id'), nullable=False)
     seg_fare = db.Column(db.Numeric(7,2), nullable=False)
