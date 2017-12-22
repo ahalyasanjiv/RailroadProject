@@ -113,6 +113,29 @@ class Trains(db.Model):
         self.train_direction = train_direction
         self.train_days = train_days
 
+class Trips(db.Model):
+    """
+    Table that stores trips
+    """
+    __tablename__ = "trips"
+    trip_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    trip_date = db.Column(db.Date, nullable=False)
+    trip_seg_start = db.Column(db.Integer, nullable=False, db.ForeignKey("segments.segment_id"))
+    trip_seg_ends = db.Column(db.Integer, nullable=False, db.ForeignKey("segments.segment_id"))
+    fare_type = db.Column(db.Integer, nullable=False, db.ForeignKey("fare_types.fare_id"))
+    fare = db.Column(db.Numeric(7,2), nullable=False)
+    trip_train_id = db.Column(db.Integer, nullable=False, db.ForeignKey("trains.train_id"))
+    reservation_id = db.Column(db.Integer, nullable=False, db.ForeignKey("reservations.reservation_id"))
+
+    def __init__(self, trip_date, trip_seg_start, trip_seg_ends, fare_type, fare, trip_train_id, reservation_id):
+        self.trip_date = trip_date
+        self.trip_seg_start = trip_seg_start
+        self.trip_seg_ends = trip_seg_ends
+        self.fare_type = fare_type
+        self.fare = fare
+        self.trip_train_id = trip_train_id
+        self.reservation_id = reservation_id
+
 
 
         
