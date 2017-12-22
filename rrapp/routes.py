@@ -1,7 +1,7 @@
 from sqlalchemy.sql.expression import func
 from flask import flash, render_template, request, session, redirect, url_for
 from rrapp import app
-# import forms
+from .forms import SignupForm, LoginForm
 from .models import db
 import urllib.parse
 import os
@@ -17,3 +17,7 @@ app.secret_key = 'development-key'
 def index():
 	return render_template('index.html')
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+    return render_template('signup.html',form=form)

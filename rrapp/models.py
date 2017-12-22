@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from sqlalchemy import desc
+from flask import session
 
 db = SQLAlchemy()
 
@@ -67,8 +68,8 @@ class SeatsFree(db.Model):
     Table that stores reservations
     """
     __tablename__ = 'seats_free'
-    train_id = db.Column(db.Integer, nullable=False, primary_key = True, db.ForeignKey('trains.train_id'))
-    segment_id = db.Column(db.Integer, nullable=False, primary_key = True, db.ForeignKey('segments.segment_id'))
+    train_id = db.Column(db.Integer, db.ForeignKey('trains.train_id'), nullable=False, primary_key = True)
+    segment_id = db.Column(db.Integer, db.ForeignKey('segments.segment_id'), nullable=False, primary_key = True)
     seat_free_date = db.Column(db.Date, nullable=False)
     freeseat = db.Column(db.Integer, nullable=False, default=448)
     
@@ -86,14 +87,16 @@ class Segment(db.Model):
     """
     __tablename__ = 'segments'
     segment_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
-    seg_n_end = db.Column(db.Integer, nullable=False, db.ForeignKey('stations.station_id'))
-    seg_s_end = db.Column(db.Integer, nullable=False, db.ForeignKey('stations.station_id'))
+    seg_n_end = db.Column(db.Integer, db.ForeignKey('stations.station_id'), nullable=False)
+    seg_s_end = db.Column(db.Integer, db.ForeignKey('stations.station_id'), nullable=False)
     seg_fare = db.Column(db.Numeric(7,2), nullable=False)
 
     def __init__(self,seg_n_end,seg_s_end,seg_fare):
         self.seg_n_end = reservation_date
         self.seg_s_end = paying_passenger_id
         self.seg_fare = card_number
+
+
 
 
         
