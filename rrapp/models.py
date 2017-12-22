@@ -65,7 +65,7 @@ class Reservation(db.Model):
 
 class SeatsFree(db.Model):
     """
-    Table that stores reservations
+    Table that stores seatsFree
     """
     __tablename__ = 'seats_free'
     train_id = db.Column(db.Integer, db.ForeignKey('trains.train_id'), nullable=False, primary_key = True)
@@ -83,7 +83,7 @@ class SeatsFree(db.Model):
 
 class Segment(db.Model):
     """
-    Table that stores reservations
+    Table that stores segments
     """
     __tablename__ = 'segments'
     segment_id = db.Column(db.Integer, nullable=False, primary_key = True, autoincrement=True)
@@ -92,10 +92,26 @@ class Segment(db.Model):
     seg_fare = db.Column(db.Numeric(7,2), nullable=False)
 
     def __init__(self,seg_n_end,seg_s_end,seg_fare):
-        self.seg_n_end = reservation_date
-        self.seg_s_end = paying_passenger_id
-        self.seg_fare = card_number
+        self.seg_n_end = seg_n_end
+        self.seg_s_end = seg_s_end
+        self.seg_fare = seg_fare
 
+class Trains(db.Model):
+    """
+    Table that stores trains
+    """
+    __tablename__ = "trains"
+    train_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    train_start = db.Column(db.Integer, nullable=False, db.ForeignKey("stations.station_id"))
+    train_end = db.Column(db.Integer, nullable=False, db.ForeignKey("stations.station_id"))
+    train_direction = db.Column(db.Integer, default=None)
+    train_days = db.Column(db.Integer, default=None)
+
+    def __init__(self, train_start, train_end, train_direction, train_days):
+        self.train_start = train_start
+        self.train_end = train_end
+        self.train_direction = train_direction
+        self.train_days = train_days
 
 
 
