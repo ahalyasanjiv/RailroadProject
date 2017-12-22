@@ -7,7 +7,7 @@ import urllib.parse
 import os
 import datetime
 
-# Connect to postgresql (local to our machine)
+# Connect to postgresql (local to your machine)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','postgresql://postgres:1@localhost:5432/cbapp')
 
 db.init_app(app)
@@ -19,5 +19,8 @@ def index():
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if 'username' in session:
+        return redirect(url_for('index'))
     form = SignupForm()
-    return render_template('signup.html',form=form)
+    if request.method == 'GET':
+    	return render_template('signup.html',form=form)
