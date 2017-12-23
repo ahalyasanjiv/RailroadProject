@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="hero is-fullheight">
+		<div class="hero-body">
+			<div class="box">
+				<form action="/reserve" method="POST">
+					<div class="field">
+						<div class="label">{{ form.start_station.label }}</div>
+						<div class="control">{{ form.start_station(class_="select") }}</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
