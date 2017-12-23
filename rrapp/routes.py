@@ -103,7 +103,8 @@ def confirmReservation():
 		newTrip = Trips(trip_date, start_station, end_station, 1, total_fare, int(train_id), reservation_id)
 		db.session.add(newTrip)
 		db.session.commit()
-		return render_template('index.html')
+		session.pop('trip_info', None)
+		return redirect(url_for('index'))
 	
 
 
