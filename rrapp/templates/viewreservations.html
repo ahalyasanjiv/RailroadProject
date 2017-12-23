@@ -28,6 +28,13 @@
 					<p>Trip Date: {{ trip_info[reservation.reservation_id]["trip_date"] }}</p>
 					<p>Start Station: {{ trip_info[reservation.reservation_id]["start_station"] }}</p>
 					<p>End Station: {{ trip_info[reservation.reservation_id]["end_station"] }}</p>
+					<br>
+					<div>
+						<form method="post">
+							<input class="button is-info" type="submit" name="modify" value="Modify"></input>
+							<input class="button is-danger" type="submit" name="cancel" value="Cancel"></input>
+						</form>
+					</div>
 				</div>
 			{% endfor %}
 		{% else %}
