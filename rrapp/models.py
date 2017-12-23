@@ -16,10 +16,10 @@ class FareType(db.Model):
     rate = db.Column(db.Numeric(3,2))
     
 
-    def __init__(self,judge_id,entry_id,vocals):
-        self.judge_id = judge_id
-        self.entry_id = entry_id
-        self.vocals = vocals
+    def __init__(self,fare_id,fare_name,rate):
+        self.fare_id = fare_id
+        self.fare_name = fare_name
+        self.rate = rate
 
 class Passenger(db.Model):
     """
