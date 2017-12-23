@@ -269,6 +269,14 @@ class Trips(db.Model):
             total_fare += seg_fare
         return total_fare
 
+    @staticmethod
+    def get_trip_info_from_reservation_id(reservation_id):
+        info = {}
+        info["trip_date"] = str(db.session.query(Trips.trip_date).filter_by(reservation_id=reservation_id).first()[0])
+        info["start_station"] = db.session.query(Trips.trip_seg_start).filter_by(reservation_id=reservation_id).first()[0]
+        info["end_station"] = db.session.query(Trips.trip_seg_ends).filter_by(reservation_id=reservation_id).first()[0]
+        return info
+
 
 class Station(db.Model):
     """

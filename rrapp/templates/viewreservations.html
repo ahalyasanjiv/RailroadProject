@@ -24,6 +24,10 @@
 				<div class="notifs notification is-dark">
 					<p>Reservation Number: {{ reservation.reservation_id }}</p>
 					<p>Reservation Date: {{ reservation.reservation_date }}</p>
+					<br>
+					<p>Trip Date: {{ trip_info[reservation.reservation_id]["trip_date"] }}</p>
+					<p>Start Station: {{ trip_info[reservation.reservation_id]["start_station"] }}</p>
+					<p>End Station: {{ trip_info[reservation.reservation_id]["end_station"] }}</p>
 				</div>
 			{% endfor %}
 		{% else %}
