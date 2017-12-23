@@ -1,8 +1,8 @@
 from sqlalchemy.sql.expression import func
 from flask import flash, render_template, request, session, redirect, url_for
 from rrapp import app
-from .forms import SignupForm, LoginForm
-from .models import db, Passenger
+from .forms import SignupForm, LoginForm, ReservationForm
+from .models import db, Passenger, Station
 import urllib.parse
 import os
 import datetime
@@ -61,4 +61,22 @@ def login():
 def logout():
 	session.pop('user', None)
 	return redirect(url_for('index'))
-    		
+
+@app.route('/reserve')
+def reserve():
+	form = ReservationForm()
+
+	def get_station_choices():
+		stationList = Station.get_all_stations()
+		stations = []
+		for station in stationList:
+			value = station.station_id
+			label = station.station_name
+
+			stations.append((value,label))
+
+		return stations
+
+	print(get_station_choices())
+
+	return render_template("reserve.html",form=form)    		

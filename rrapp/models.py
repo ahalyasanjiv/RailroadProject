@@ -159,6 +159,12 @@ class Station(db.Model):
         self.station_name = station_name
         self.station_symbol = station_symbol
 
+    @staticmethod
+    def get_all_stations():
+        q = db.session.query(Station).all()
+        return q
+        #return []
+
 class StopsAt(db.Model):
     """
     Stops at table.
