@@ -85,11 +85,39 @@ class SeatsFree(db.Model):
     
     
 
-    def __init__(self,train_id,segment_id,seat_free_date,billing_address):
-        self.reservation_date = reservation_date
-        self.paying_passenger_id = paying_passenger_id
-        self.card_number = card_number
-        self.billing_address = billing_address
+    def __init__(self,train_id,segment_id,seat_free_date,freeseat):
+        self.train_id = train_id
+        self.segment_id = segment_id
+        self.seat_free_date = seat_free_date
+        self.freeseat = freeseat
+
+    @staticmethod
+    def is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+    	# if direction of trip does not match train direction, return False
+    	direction = Trips.get_trip_direction(start_station,end_station)
+    	train_direction = db.session.query(Trains.train_direction).filter_by(train_id = train_id).first()
+    	if train_direction:
+    		if direction != train_direction[0]:
+    			return False
+    	if not train_direction:
+    		return False
+    	# if northbound, set start_station to seg_n_end and end_station to seg_s_end
+    	if direction == 1:
+    		seg_n_end = start_station
+    		seg_s_end = end_station
+    	# else, flip it
+    	else:
+    		seg_n_end = end_station
+    		seg_s_end = start_station
+    	# for every segment between seg_n_end and seg_s_end:
+    	for i in range(seg_n_end,seg_s_end):
+    		# query the segments table to get the segment id of that segment
+    		segment = Segment.get_segment(i)
+    		# check if there is at least 1 empty seat for that trip
+    		if db.session.query(SeatsFree.freeseat).filter_by(train_id = train_id, segment_id = segment, seat_free_date = seat_free_date).first()[0] < 1:
+    			return False
+    	# return True
+    	return True
 
 class Segment(db.Model):
     """
@@ -105,6 +133,11 @@ class Segment(db.Model):
         self.seg_n_end = seg_n_end
         self.seg_s_end = seg_s_end
         self.seg_fare = seg_fare
+
+    @staticmethod
+    def get_segment(seg_n_end):
+    	segment = db.session.query(Segment.segment_id).filter_by(seg_n_end = seg_n_end).first()[0]
+    	return segment
 
 class Trains(db.Model):
     """
@@ -146,6 +179,13 @@ class Trips(db.Model):
         self.trip_train_id = trip_train_id
         self.reservation_id = reservation_id
 
+    @staticmethod
+    def get_trip_direction(start_station,end_station):
+    	if start_station > end_station:
+    		return 0
+    	elif end_station > start_station:
+    		return 1
+
 class Station(db.Model):
     """
     Table that stores stations.
@@ -158,6 +198,8 @@ class Station(db.Model):
     def __init__(self, station_name, station_symbol):
         self.station_name = station_name
         self.station_symbol = station_symbol
+
+
 
 class StopsAt(db.Model):
     """

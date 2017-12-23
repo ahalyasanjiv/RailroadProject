@@ -2,7 +2,7 @@ from sqlalchemy.sql.expression import func
 from flask import flash, render_template, request, session, redirect, url_for
 from rrapp import app
 from .forms import SignupForm, LoginForm
-from .models import db, Passenger
+from .models import db, Passenger, SeatsFree, Segment, Trips, Trains
 import urllib.parse
 import os
 import datetime
@@ -57,8 +57,13 @@ def login():
 			flash('Incorrect username or password.')
 			return render_template('login.html',form=form)
 
-@app.route('/logout/')
+@app.route('/logout')
 def logout():
 	session.pop('user', None)
 	return redirect(url_for('index'))
+
+@app.route('/choosetrip')
+def choosetrip():
+	return render_template('choosetrip.html',test_val=test_val)
+
     		
