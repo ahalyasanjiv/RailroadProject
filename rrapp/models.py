@@ -47,6 +47,12 @@ class Passenger(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password,password)
 
+    @staticmethod
+    def is_unique_email(email):
+    	if db.session.query(Passenger.passenger_id).filter(Passenger.email==email).count() > 0:
+    		return False
+    	return True
+
 
 class Reservation(db.Model):
     """

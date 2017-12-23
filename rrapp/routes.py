@@ -46,9 +46,19 @@ def login():
 	if request.method == 'GET':
 		return render_template('login.html',form=form)
 	else:
-		return render_template('login.html',form=form)
-		# if form.validate():
-		# 	email = form.email.data
-		# 	password = form.password.data
-		# 	passenger = Passenger.query.filter_by(email=email).first()
+		if form.validate():
+			email = form.email.data
+			password = form.password.data
+			passenger = Passenger.query.filter_by(email=email).first()
+			if passenger is not None and passenger.check_password(password):
+				session['user'] = email
+			return redirect(url_for('index'))
+		else:
+			flash('Incorrect username or password.')
+			return render_template('login.html',form=form)
+
+@app.route('/logout/')
+def logout():
+	session.pop('user', None)
+	return redirect(url_for('index'))
     		
