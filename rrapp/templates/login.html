@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="hero is-link is-fullheight">
+<section class="hero is-fullheight">
 <div class="hero-body">
   <div class="container has-text-centered">
   	<div class="columns">
@@ -10,45 +10,42 @@
 	    <h1 class="title has-text-centered">
 	      	Login
 	    </h1>
+    	<form method="POST" action="/login">
+    		{{ form.hidden_tag() }}
+    		{% with messages = get_flashed_messages() %}
+		        {% if messages %}
+		            <div class=flashes>
+		            	{% for message in messages %}
+		                	{{ message }}
+		            	{% endfor %}
+		            </div>
+		        {% endif %}
+	        {% endwith %}
 
-	    <div id="login-box" class="box">
-	    	<form method="POST" action="/login">
-	    		{{ form.hidden_tag() }}
-	    		{% with messages = get_flashed_messages() %}
-			        {% if messages %}
-			            <div class=flashes>
-			            	{% for message in messages %}
-			                	{{ message }}
-			            	{% endfor %}
-			            </div>
-			        {% endif %}
-		        {% endwith %}
-
-		        <div class="field">
-			        <div class="control">
-			        	{{ form.email(placeholder="Email", class="form-control input is-medium") }}
-			        </div>
-			        {% if form.email.errors %}
-			            {% for error in form.email.errors %}
-			              <p class="is-danger">{{ error }}</p>
-			            {% endfor %}
-			        {% endif %}
-		    	</div>
-		        <div class="field">
-			        <div class="control">
-		        		{{ form.password(placeholder="Password", class="form-control input is-medium") }}
-		        	</div>
-		        	{% if form.password.errors %}
-			            {% for error in form.password.errors %}
-			              <p class="is-danger">{{ error }}</p>
-			            {% endfor %}
-			        {% endif %}
-		    	</div>
-		    	<div class="has-text-centered">
-		    		{{ form.submit(class="button is-info is-medium") }}
-		    	</div>
-	    	</form>
-	    </div>
+	        <div class="field">
+		        <div class="control">
+		        	{{ form.email(placeholder="Email", class="form-control input is-medium") }}
+		        </div>
+		        {% if form.email.errors %}
+		            {% for error in form.email.errors %}
+		              <p class="is-danger">{{ error }}</p>
+		            {% endfor %}
+		        {% endif %}
+	    	</div>
+	        <div class="field">
+		        <div class="control">
+	        		{{ form.password(placeholder="Password", class="form-control input is-medium") }}
+	        	</div>
+	        	{% if form.password.errors %}
+		            {% for error in form.password.errors %}
+		              <p class="is-danger">{{ error }}</p>
+		            {% endfor %}
+		        {% endif %}
+	    	</div>
+	    	<div class="has-text-centered">
+	    		{{ form.submit(class="button is-info is-medium") }}
+	    	</div>
+    	</form>
 		</div>
 	</div>
   </div>
