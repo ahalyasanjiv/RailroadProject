@@ -17,7 +17,7 @@ app.secret_key = 'development-key'
 def index():
 	return render_template('index.html')
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup/', methods=['GET', 'POST'])
 def signup():
     if 'user' in session:
         return redirect(url_for('index'))
@@ -36,7 +36,7 @@ def signup():
    		else:
    			return render_template('signup.html',form=form)
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login/', methods=['GET','POST'])
 def login():
 	if 'user' in session:
 		return redirect(url_for('index'))
@@ -57,21 +57,23 @@ def login():
 			flash('Incorrect username or password.')
 			return render_template('login.html',form=form)
 
-@app.route('/logout')
+@app.route('/logout/')
 def logout():
 	session.pop('user', None)
 	return redirect(url_for('index'))
 
-@app.route('/choosetrip/')
-def choosetrip():
-	# test_val = SeatsFree.is_train_free_for_trip(1,2,1,'2017-11-13')
-	# test_val = Trips.get_trip_direction(2,1)
-	# test_val = Segment.get_segment(4)
-	# test_val = db.session.query(Trains.train_direction).filter_by(train_id = 1).first()
-	# test_val = db.session.query(SeatsFree.freeseat).filter_by(train_id = 1,segment_id = 1, seat_free_date = '2017-11-13').first()[0]
-	test_val = Trains.get_available_trains(2,1,'2017-11-13')
-	# test_val = Trains.get_train_time_in(1,1)
-
-	return render_template('choosetrip.html',test_val=test_val)
-
+@app.route('/choosetrip/', methods=['GET','POST'])
+def choosetrip(start_station=None,end_station=None,trip_date=None):
+	start_station = 2
+	end_station = 1
+	trip_date = '2017-11-13'
+	available_trains = Trains.get_available_trains(start_station,end_station,trip_date)
+	if request.method ==  'GET':
+		return render_template('choosetrip.html',available_trains=available_trains)
+	else:
+		if request.form['train'] != '-1':
+			return render_template('choosetrip.html',available_trains=available_trains)
+		else:
+			flash('Please select a train.')
+			return render_template('choosetrip.html',available_trains=available_trains)
     		

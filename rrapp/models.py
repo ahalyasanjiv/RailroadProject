@@ -171,24 +171,24 @@ class Trains(db.Model):
 
     @staticmethod
     def get_available_trains(start_station,end_station,seat_free_date):
-    	trains = Trains.get_all_train_ids()
-    	available_trains = []
-    	for train_id in trains:
-    		if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
-    			time_in = str(Trains.get_train_time_in(train_id,start_station))
-    			time_out = str(Trains.get_train_time_out(train_id,end_station))
-    			available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out})
-    	return available_trains
-
+        trains = Trains.get_all_train_ids()
+        available_trains = []
+        for train_id in trains:
+            if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+                time_in = str(Trains.get_train_time_in(train_id,start_station))
+                time_out = str(Trains.get_train_time_out(train_id,end_station))
+                total_fare = Trips.get_trip_fare(start_station,end_station)
+                available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out,'total_fare':total_fare})
+        return available_trains
     @staticmethod
     def get_train_time_in(train_id, station_id):
-    	time_in = db.session.query(StopsAt.time_in).filter_by(train_id = train_id, station_id=station_id).first()[0]
-    	return time_in
+        time_in = db.session.query(StopsAt.time_in).filter_by(train_id = train_id, station_id=station_id).first()[0]
+        return time_in
 
     @staticmethod
     def get_train_time_out(train_id, station_id):
-    	time_out = db.session.query(StopsAt.time_out).filter_by(train_id = train_id, station_id=station_id).first()[0]
-    	return time_out
+        time_out = db.session.query(StopsAt.time_out).filter_by(train_id = train_id, station_id=station_id).first()[0]
+        return time_out
 
 class Trips(db.Model):
     """
@@ -219,6 +219,21 @@ class Trips(db.Model):
     		return 0
     	elif end_station > start_station:
     		return 1
+
+    @staticmethod
+    def get_trip_fare(start_station,end_station):
+        if start_station > end_station:
+            seg_n_end = end_station
+            seg_s_end = start_station
+        else:
+            seg_n_end = start_station
+            seg_s_end = end_station
+        total_fare = 0
+        for i in range(seg_n_end,seg_s_end):
+            seg_fare = db.session.query(Segment.seg_fare).filter_by(segment_id = i).first()[0]
+            total_fare += seg_fare
+        return total_fare
+
 
 class Station(db.Model):
     """

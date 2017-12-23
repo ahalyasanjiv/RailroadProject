@@ -13,15 +13,34 @@
 
 <div class ="hero-body">
 	<div class="container ">
-			<div class="columns">
-				<div class="column is-one-quarter">
+		<div class="columns">
+			<div class="column is-one-quarter">
+			</div>
+			<div class="column is-half">
+				<h2 class="title is-1 has-text-centered">
+		        	Choose a Train
+		   		</h2>
+		    <h2 class="subtitle is-3 has-text-centered">Total Fare: ${{ 100 }}</h2>
+		    {% with messages = get_flashed_messages() %}
+	          {% if messages %}
+	            <div class=flashes>
+	              {% for message in messages %}
+	                {{ message }}
+	              {% endfor %}
+	            </div>
+	          {% endif %}
+	        {% endwith %}
+		    <form action="{{ url_for('choosetrip') }}" method="POST">
+		    	<input type="radio" name="train" value=-1 style="visibility: hidden;" checked/>
+		    {% for train in available_trains %}
+		    	<div class="notification is-dark">
+					<input type="radio" name="train" value={{ train.train_id }} class="is-pulled-right">
+				  	<h2 class="title is-2">Train {{ train.train_id }}</h2>
+				  	<h2 class="subtitle is-3">{{ train.time_in }}&emsp;&#8658;&emsp;{{ train.time_out }}</h2>
 				</div>
-				<div class="column is-half">
-					<h2 class="title is-3 has-text-centered">
-			        Choose a Trip
-			    </h2>
-			    {{ test_val }}
-
+		    {% endfor %}
+			<input type="submit" name="submit" id="chooseReservation" value="Confirm Reservation" class="button is-dark">
+			</form>
 			</div>
 		</div>
 	</div>
