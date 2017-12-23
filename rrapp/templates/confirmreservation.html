@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero is-dark">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+      Confirm Reservation
+    </h1>
+  </div>
+</div>
+</section>
+<div class ="hero-body">
+	<div class="container ">
+		<div class="columns">
+			<div class="column is-one-quarter">
+			</div>
+			<div class="column is-half">
+		    {% with messages = get_flashed_messages() %}
+	          {% if messages %}
+	            <div class=flashes>
+	              {% for message in messages %}
+	                {{ message }}
+	              {% endfor %}
+	            </div>
+	          {% endif %}
+	        {% endwith %}
+		    <form action="{{ url_for('confirmReservation') }}" method="POST">
+		    <div class="notification">
+		    	<div class="columns">
+				<div class="column is-one-third"></div>
+				<div class="column is-one-third">
+		    	<p><strong>Start Station:</strong> {{ trip_info.start_station}}</p>
+		    	<p><strong>Total Fare:</strong> {{ trip_info.end_station}}</p>
+		    	<p><strong>Trip Date:</strong> {{ trip_info.trip_date}}</p>
+		    	<p><strong>Train Number:</strong> {{ trip_info.train_id}}</p>
+		    	<p><strong>Departure:</strong> {{ trip_info.time_in}}</p>
+		    	<p><strong>Arrival:</strong> {{ trip_info.time_out}}</p>
+		    	<p><strong>Total Fare:</strong> ${{ trip_info.total_fare}}</p><br>
+				<input type="submit" name="submit" id="confirmReservation" value="Confirm Reservation" style="background-color:#800000;" class="button is-dark">
+				</div>
+				</div>
+			</div>
+			</form>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

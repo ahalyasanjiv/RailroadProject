@@ -20,7 +20,7 @@
 					<h2 class="title is-3 has-text-centered">
 			        Sign Up Page
 			    </h2>
-			    <form method="POST" action="/signup">
+			    <form method="POST" action="{{ url_for('signup') }}">
 
 					{{ form.hidden_tag() }}
 		    		{% with messages = get_flashed_messages() %}

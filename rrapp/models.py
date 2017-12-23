@@ -33,8 +33,6 @@ class Passenger(db.Model):
     password = db.Column(db.String(100))
     preferred_card_number = db.Column(db.String(16))
     preferred_billing_address = db.Column(db.String(100))
-    
-    
 
     def __init__(self,fname,lname,email,password,preferred_card_number,preferred_billing_address):
         self.fname = fname
@@ -52,6 +50,18 @@ class Passenger(db.Model):
     	if db.session.query(Passenger.passenger_id).filter(Passenger.email==email).count() > 0:
     		return False
     	return True
+
+    @staticmethod
+    def get_passenger_info(email):
+        passenger = db.session.query(Passenger).filter(Passenger.email==email).first()
+        return {
+            'passenger_id':passenger.passenger_id,
+            'fname':passenger.fname,
+            'lname':passenger.lname,
+            'email':passenger.email,
+            'card_number':passenger.preferred_card_number,
+            'billing_address':passenger.preferred_billing_address
+        }
 
 
 class Reservation(db.Model):
@@ -72,6 +82,11 @@ class Reservation(db.Model):
         self.paying_passenger_id = paying_passenger_id
         self.card_number = card_number
         self.billing_address = billing_address
+
+    @staticmethod
+    def get_reservation_id(reservation_date,paying_passenger_id):
+        reservation_id = db.session.query(Reservation.reservation_id).filter_by(reservation_date = reservation_date, paying_passenger_id=paying_passenger_id).first()[0]
+        return reservation_id
 
 class SeatsFree(db.Model):
     """

@@ -20,7 +20,7 @@
 				<h2 class="title is-1 has-text-centered">
 		        	Choose a Train
 		   		</h2>
-		    <h2 class="subtitle is-3 has-text-centered">Total Fare: ${{ 100 }}</h2>
+		    <h2 class="subtitle is-3 has-text-centered"></h2>
 		    {% with messages = get_flashed_messages() %}
 	          {% if messages %}
 	            <div class=flashes>
@@ -30,7 +30,7 @@
 	            </div>
 	          {% endif %}
 	        {% endwith %}
-		    <form action="{{ url_for('choosetrip') }}" method="POST">
+		    <form action="{{ url_for('chooseTrip') }}" method="POST">
 		    	<input type="radio" name="train" value=-1 style="visibility: hidden;" checked/>
 		    {% for train in available_trains %}
 		    	<div class="notification is-dark">
