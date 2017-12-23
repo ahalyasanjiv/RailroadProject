@@ -154,12 +154,3 @@ def modifyReservation():
 @app.route("/cancelreservation", methods=["GET", "POST"])
 def cancelReservation():
     return render_template("index.html")
-    if 'user' not in session:
-        return render_template('index.html')
-    else:
-        passenger_info = Passenger.get_passenger_info(session['user'])
-        reservations = Reservation.get_passenger_reservations(passenger_info['passenger_id'])
-        trip_info = {}
-        for reservation in reservations:
-            trip_info[reservation["reservation_id"]] = Trips.get_trip_info_from_reservation_id(reservation["reservation_id"])
-        return render_template('viewreservations.html', reservations=reservations, trip_info=trip_info)
