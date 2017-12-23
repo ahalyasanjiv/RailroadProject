@@ -29,7 +29,7 @@ class Passenger(db.Model):
     passenger_id = db.Column(db.Integer, nullable=False, primary_key = True)
     fname = db.Column(db.String(30))
     lname = db.Column(db.String(100))
-    email = db.Column(db.String(100))
+    email = db.Column(db.String(100),nullable=False,unique=True)
     password = db.Column(db.String(100))
     preferred_card_number = db.Column(db.String(16))
     preferred_billing_address = db.Column(db.String(100))
@@ -44,7 +44,8 @@ class Passenger(db.Model):
         self.preferred_card_number = preferred_card_number
         self.preferred_billing_address = preferred_billing_address
 
-    
+    def check_password(self, password):
+        return check_password_hash(self.password,password)
 
 
 class Reservation(db.Model):
@@ -158,8 +159,8 @@ class StopsAt(db.Model):
     """
 
     __tablename__= 'stops_at'
-    train_id = db.Column(db.Integer, nullable=False, primary_key=True, db.ForeignKey('trains.train_id'))
-    station_id = db.Column(db.Integer, nullable=False, primary_key=True, db.ForeignKey('stations.station_id'))
+    train_id = db.Column(db.Integer, db.ForeignKey('trains.train_id'), nullable=False, primary_key=True)
+    station_id = db.Column(db.Integer, db.ForeignKey('stations.station_id'), nullable=False, primary_key=True)
     time_in = db.Column(db.Time)
     time_out = db.Column(db.Time)
 
