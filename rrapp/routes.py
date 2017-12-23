@@ -135,6 +135,4 @@ def viewReservations():
     trip_info = {}
     for reservation in reservations:
       trip_info[reservation["reservation_id"]] = Trips.get_trip_info_from_reservation_id(reservation["reservation_id"])
-    print(reservations)
-    print(trip_info)
     return render_template('viewreservations.html', reservations=reservations, trip_info=trip_info)
