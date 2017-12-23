@@ -91,7 +91,7 @@ def reserve():
 def chooseTrip(start_station,end_station,trip_date):
     if 'user' not in session:
         return redirect(url_for('index'))
-    available_trains = Trains.get_available_trains(start_station,end_station,trip_date)
+    available_trains = Trains.get_available_trains(int(start_station),int(end_station),trip_date)
     if request.method ==  'GET':
         return render_template('choosetrip.html',available_trains=available_trains,start_station=start_station, end_station=end_station, trip_date=trip_date)
     else:
