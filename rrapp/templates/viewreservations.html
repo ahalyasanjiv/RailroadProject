@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+{% if session['user'] %}
+<section class="hero is-dark">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+      View Past Reservations
+    </h1>
+  </div>
+</div>
+</section>
+{% endif %}
+
+<div class="section" id="view-reservations">
+	<div class="columns">
+	<div class="column is-one-third"></div>
+	<div class="column is-one-third">
+	{% if not session['user'] %}
+	<h1 class='title'>Create an account or login to make reservations</h1>
+	{% else %}
+		{% if reservations %}
+			{% for reservation in reservations %}
+				<div class="notifs notification is-dark">
+					<p>Reservation Number: {{ reservation.reservation_id }}</p>
+					<p>Reservation Date: {{ reservation.reservation_date }}</p>
+				</div>
+			{% endfor %}
+		{% else %}
+		<div class="notification is-dark has-text-centered">
+			<p>You have no reservations.</p>
+		</div>
+		{% endif %}
+	{% endif %}
+	</div>
+	</div>
+</div>
+{% endblock %}
