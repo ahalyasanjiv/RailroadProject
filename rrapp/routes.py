@@ -62,10 +62,8 @@ def logout():
 	session.pop('user', None)
 	return redirect(url_for('index'))
 
-@app.route('/reserve')
+@app.route('/reserve', methods=["GET", "POST"])
 def reserve():
-	form = ReservationForm()
-
 	def get_station_choices():
 		stationList = Station.get_all_stations()
 		stations = []
@@ -76,13 +74,22 @@ def reserve():
 			stations.append((value,label))
 
 		return stations
+  	#######################################
 
-	print(get_station_choices())
+	form = ReservationForm()
 
-	return render_template("reserve.html",form=form)    		
+	if request.method == "GET":
+		return render_template("reserve.html",form=form)
+	elif request.method == "POST":
+		start = form.start_station.data
+		end = form.end_station.data
+		date= form.date.data
 
-@app.route('/choosetrip/', methods=['GET','POST'])
-def chooseTrip(start_station=None,end_station=None,trip_date=None):
+		return redirect(url_for('chooseTrip', start_station=start, end_station=end, trip_date=date))
+
+
+@app.route('/choosetrip/<start_station>/<end_station>/<trip_date>', methods=['GET','POST'])
+def chooseTrip(start_station,end_station,trip_date):
 	if 'user' not in session:
 		return redirect(url_for('index'))
 	start_station = 2
@@ -90,14 +97,14 @@ def chooseTrip(start_station=None,end_station=None,trip_date=None):
 	trip_date = '2017-11-13'
 	available_trains = Trains.get_available_trains(start_station,end_station,trip_date)
 	if request.method ==  'GET':
-		return render_template('choosetrip.html',available_trains=available_trains)
+		return render_template('choosetrip.html',available_trains=available_trains,start_station=start_station, end_station=end_station, trip_date=trip_date)
 	else:
 		if request.form['train'] != '-1':
 			session['trip_info'] = {'start_station':start_station,'end_station':end_station,'train_id':request.form['train'],'trip_date':trip_date}
 			return redirect(url_for('confirmReservation'))
 		else:
 			flash('Please select a train.')
-			return render_template('choosetrip.html',available_trains=available_trains)
+			return render_template('choosetrip.html',available_trains=available_trains,start_station=start_station, end_station=end_station, trip_date=trip_date)
 
 @app.route('/confirmreservation', methods=['GET','POST'])
 def confirmReservation():
