@@ -2,7 +2,7 @@ from sqlalchemy.sql.expression import func
 from flask import flash, render_template, request, session, redirect, url_for
 from rrapp import app
 from .forms import SignupForm, LoginForm, ReservationForm
-from .models import db, Passenger, SeatsFree, Segment, Trips, Trains, Reservation
+from .models import db, Passenger, SeatsFree, Segment, Trips, Trains, Reservation, Station
 import urllib.parse
 import os
 import datetime
@@ -124,3 +124,7 @@ def confirmReservation():
 		db.session.commit()
 		session.pop('trip_info', None)
 		return redirect(url_for('index'))
+
+@app.route('/viewReservations')
+def viewReservations():
+	return render_template("index.html")

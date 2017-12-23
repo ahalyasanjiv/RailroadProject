@@ -3,11 +3,39 @@
 {% block content %}
 	<div class="hero is-fullheight">
 		<div class="hero-body">
-			<div class="box">
+			<div class="container">
 				<form action="/reserve" method="POST">
-					<div class="field">
-						<div class="label">{{ form.start_station.label }}</div>
-						<div class="control">{{ form.start_station(class_="select") }}</div>
+					<div class="field is-grouped is-grouped-centered">
+						<div class="control">
+							<div class="label">{{ form.start_station.label }}</div>
+							{{ form.start_station(class_="select is-large") }}
+							{% if form.start_station.errors %}
+		            			{% for error in form.start_station.errors %}
+		              				<p class="is-danger">{{ error }}</p>
+		            			{% endfor %}
+		        			{% endif %}
+						</div>
+						<div class="control">
+							<div class="label">{{ form.end_station.label }}</div>
+							{{ form.end_station(class_="select is-large") }}
+							{% if form.end_station.errors %}
+		            			{% for error in form.end_station.errors %}
+		              				<p class="is-danger">{{ error }}</p>
+		            			{% endfor %}
+		        			{% endif %}
+						</div>
+						<div class="control">
+							<div class="label">{{ form.date.label }}</div>
+							{{ form.date(class_="input is-large", placeholder="yy-mm-dd") }}
+							{% if form.date.errors %}
+		            			{% for error in form.date.errors %}
+		              				<p class="is-danger">{{ error }}</p>
+		            			{% endfor %}
+		        			{% endif %}
+						</div>
+					</div>
+					<div class="field has-text-centered">
+						{{ form.submit(class_="button is-primary") }}
 					</div>
 				</form>
 			</div>
