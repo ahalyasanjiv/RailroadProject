@@ -2,7 +2,7 @@ from sqlalchemy.sql.expression import func
 from flask import flash, render_template, request, session, redirect, url_for
 from rrapp import app
 from .forms import SignupForm, LoginForm, ReservationForm
-from .models import db, Passenger, Station
+from .models import db, Passenger, SeatsFree, Segment, Trips, Trains, Reservation
 import urllib.parse
 import os
 import datetime
@@ -17,7 +17,7 @@ app.secret_key = 'development-key'
 def index():
 	return render_template('index.html')
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup/', methods=['GET', 'POST'])
 def signup():
     if 'user' in session:
         return redirect(url_for('index'))
@@ -36,7 +36,7 @@ def signup():
    		else:
    			return render_template('signup.html',form=form)
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login/', methods=['GET','POST'])
 def login():
 	if 'user' in session:
 		return redirect(url_for('index'))
@@ -80,3 +80,47 @@ def reserve():
 	print(get_station_choices())
 
 	return render_template("reserve.html",form=form)    		
+
+@app.route('/choosetrip/', methods=['GET','POST'])
+def chooseTrip(start_station=None,end_station=None,trip_date=None):
+	if 'user' not in session:
+		return redirect(url_for('index'))
+	start_station = 2
+	end_station = 1
+	trip_date = '2017-11-13'
+	available_trains = Trains.get_available_trains(start_station,end_station,trip_date)
+	if request.method ==  'GET':
+		return render_template('choosetrip.html',available_trains=available_trains)
+	else:
+		if request.form['train'] != '-1':
+			session['trip_info'] = {'start_station':start_station,'end_station':end_station,'train_id':request.form['train'],'trip_date':trip_date}
+			return redirect(url_for('confirmReservation'))
+		else:
+			flash('Please select a train.')
+			return render_template('choosetrip.html',available_trains=available_trains)
+
+@app.route('/confirmreservation', methods=['GET','POST'])
+def confirmReservation():
+	if 'user' not in session or 'trip_info' not in session:
+		return redirect(url_for('index'))
+	start_station = session['trip_info']['start_station']
+	end_station = session['trip_info']['end_station']
+	train_id = session['trip_info']['train_id']
+	total_fare = Trips.get_trip_fare(start_station,end_station)
+	trip_date = session['trip_info']['trip_date']
+	time_in = str(Trains.get_train_time_in(train_id,start_station))
+	time_out = str(Trains.get_train_time_out(train_id,end_station))
+	trip_info = {'start_station':start_station, 'end_station':end_station, 'train_id':train_id, 'trip_date':trip_date, 'time_in':time_in, 'time_out':time_out, 'total_fare':total_fare}
+	if request.method == 'GET':
+		return render_template('confirmreservation.html',trip_info=trip_info)
+	else:
+		passenger_info = Passenger.get_passenger_info(session['user'])
+		reservation_date = func.now()
+		newReservation = Reservation(reservation_date, passenger_info['passenger_id'], passenger_info['card_number'], passenger_info['billing_address'])
+		db.session.add(newReservation)
+		reservation_id = Reservation.get_reservation_id(reservation_date, passenger_info['passenger_id'])
+		newTrip = Trips(trip_date, start_station, end_station, 1, total_fare, int(train_id), reservation_id)
+		db.session.add(newTrip)
+		db.session.commit()
+		session.pop('trip_info', None)
+		return redirect(url_for('index'))

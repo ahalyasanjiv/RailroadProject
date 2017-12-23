@@ -16,10 +16,10 @@ class FareType(db.Model):
     rate = db.Column(db.Numeric(3,2))
     
 
-    def __init__(self,judge_id,entry_id,vocals):
-        self.judge_id = judge_id
-        self.entry_id = entry_id
-        self.vocals = vocals
+    def __init__(self,fare_id,fare_name,rate):
+        self.fare_id = fare_id
+        self.fare_name = fare_name
+        self.rate = rate
 
 class Passenger(db.Model):
     """
@@ -33,8 +33,6 @@ class Passenger(db.Model):
     password = db.Column(db.String(100))
     preferred_card_number = db.Column(db.String(16))
     preferred_billing_address = db.Column(db.String(100))
-    
-    
 
     def __init__(self,fname,lname,email,password,preferred_card_number,preferred_billing_address):
         self.fname = fname
@@ -52,6 +50,18 @@ class Passenger(db.Model):
     	if db.session.query(Passenger.passenger_id).filter(Passenger.email==email).count() > 0:
     		return False
     	return True
+
+    @staticmethod
+    def get_passenger_info(email):
+        passenger = db.session.query(Passenger).filter(Passenger.email==email).first()
+        return {
+            'passenger_id':passenger.passenger_id,
+            'fname':passenger.fname,
+            'lname':passenger.lname,
+            'email':passenger.email,
+            'card_number':passenger.preferred_card_number,
+            'billing_address':passenger.preferred_billing_address
+        }
 
 
 class Reservation(db.Model):
@@ -73,6 +83,11 @@ class Reservation(db.Model):
         self.card_number = card_number
         self.billing_address = billing_address
 
+    @staticmethod
+    def get_reservation_id(reservation_date,paying_passenger_id):
+        reservation_id = db.session.query(Reservation.reservation_id).filter_by(reservation_date = reservation_date, paying_passenger_id=paying_passenger_id).first()[0]
+        return reservation_id
+
 class SeatsFree(db.Model):
     """
     Table that stores seatsFree
@@ -85,11 +100,12 @@ class SeatsFree(db.Model):
     
     
 
-    def __init__(self,train_id,segment_id,seat_free_date,billing_address):
-        self.reservation_date = reservation_date
-        self.paying_passenger_id = paying_passenger_id
-        self.card_number = card_number
-        self.billing_address = billing_address
+    def __init__(self,train_id,segment_id,seat_free_date,freeseat):
+        self.train_id = train_id
+        self.segment_id = segment_id
+        self.seat_free_date = seat_free_date
+        self.freeseat = freeseat
+
 
 class Segment(db.Model):
     """
@@ -105,6 +121,11 @@ class Segment(db.Model):
         self.seg_n_end = seg_n_end
         self.seg_s_end = seg_s_end
         self.seg_fare = seg_fare
+
+    @staticmethod
+    def get_segment(seg_n_end):
+    	segment = db.session.query(Segment.segment_id).filter_by(seg_n_end = seg_n_end).first()[0]
+    	return segment
 
 class Trains(db.Model):
     """
@@ -122,6 +143,67 @@ class Trains(db.Model):
         self.train_end = train_end
         self.train_direction = train_direction
         self.train_days = train_days
+
+    @staticmethod
+    def get_all_train_ids():
+    	trains_query = db.session.query(Trains.train_id).all()
+    	trains = []
+    	for train in trains_query:
+    		trains.append(train[0])
+    	trains.sort()
+    	return trains
+
+    @staticmethod
+    def is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+    	# if direction of trip does not match train direction, return False
+    	direction = Trips.get_trip_direction(start_station,end_station)
+    	train_direction = db.session.query(Trains.train_direction).filter_by(train_id = train_id).first()
+    	if train_direction:
+    		if direction != train_direction[0]:
+    			return False
+    	if not train_direction:
+    		return False
+    	# if northbound, set start_station to seg_n_end and end_station to seg_s_end
+    	if direction == 1:
+    		seg_n_end = start_station
+    		seg_s_end = end_station
+    	# else, flip it
+    	else:
+    		seg_n_end = end_station
+    		seg_s_end = start_station
+    	# check if train is in seats_free table
+    	if db.session.query(SeatsFree).filter_by(train_id = train_id, seat_free_date=seat_free_date).count() == 0:
+    		return False
+    	# for every segment between seg_n_end and seg_s_end:
+    	for i in range(seg_n_end,seg_s_end):
+    		# query the segments table to get the segment id of that segment
+    		segment = Segment.get_segment(i)
+    		# check if there is at least 1 empty seat for that trip
+    		if db.session.query(SeatsFree.freeseat).filter_by(train_id = train_id, segment_id = segment, seat_free_date = seat_free_date).first()[0] < 1:
+    			return False
+    	# return True
+    	return True
+
+    @staticmethod
+    def get_available_trains(start_station,end_station,seat_free_date):
+        trains = Trains.get_all_train_ids()
+        available_trains = []
+        for train_id in trains:
+            if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+                time_in = str(Trains.get_train_time_in(train_id,start_station))
+                time_out = str(Trains.get_train_time_out(train_id,end_station))
+                total_fare = Trips.get_trip_fare(start_station,end_station)
+                available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out,'total_fare':total_fare})
+        return available_trains
+    @staticmethod
+    def get_train_time_in(train_id, station_id):
+        time_in = db.session.query(StopsAt.time_in).filter_by(train_id = train_id, station_id=station_id).first()[0]
+        return time_in
+
+    @staticmethod
+    def get_train_time_out(train_id, station_id):
+        time_out = db.session.query(StopsAt.time_out).filter_by(train_id = train_id, station_id=station_id).first()[0]
+        return time_out
 
 class Trips(db.Model):
     """
@@ -145,6 +227,28 @@ class Trips(db.Model):
         self.fare = fare
         self.trip_train_id = trip_train_id
         self.reservation_id = reservation_id
+
+    @staticmethod
+    def get_trip_direction(start_station,end_station):
+    	if start_station > end_station:
+    		return 0
+    	elif end_station > start_station:
+    		return 1
+
+    @staticmethod
+    def get_trip_fare(start_station,end_station):
+        if start_station > end_station:
+            seg_n_end = end_station
+            seg_s_end = start_station
+        else:
+            seg_n_end = start_station
+            seg_s_end = end_station
+        total_fare = 0
+        for i in range(seg_n_end,seg_s_end):
+            seg_fare = db.session.query(Segment.seg_fare).filter_by(segment_id = i).first()[0]
+            total_fare += seg_fare
+        return total_fare
+
 
 class Station(db.Model):
     """

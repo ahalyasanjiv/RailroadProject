@@ -10,7 +10,7 @@
 	    <h1 class="title has-text-centered">
 	      	Login
 	    </h1>
-    	<form method="POST" action="/login">
+    	<form method="POST" action="{{ url_for('login') }}">
     		{{ form.hidden_tag() }}
     		{% with messages = get_flashed_messages() %}
 		        {% if messages %}
