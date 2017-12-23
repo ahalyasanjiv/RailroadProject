@@ -64,6 +64,13 @@ def logout():
 
 @app.route('/choosetrip')
 def choosetrip():
+	# test_val = SeatsFree.is_train_free_for_trip(1,2,1,'2017-11-13')
+	# test_val = Trips.get_trip_direction(2,1)
+	# test_val = Segment.get_segment(4)
+	# test_val = db.session.query(Trains.train_direction).filter_by(train_id = 1).first()
+	# test_val = db.session.query(SeatsFree.freeseat).filter_by(train_id = 1,segment_id = 1, seat_free_date = '2017-11-13').first()[0]
+	test_val = Trains.get_available_trains(2,1,'2017-11-13')
+	# test_val = Trains.get_train_time_in(1,1)
 	return render_template('choosetrip.html',test_val=test_val)
 
     		

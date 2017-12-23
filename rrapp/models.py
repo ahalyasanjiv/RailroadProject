@@ -91,33 +91,6 @@ class SeatsFree(db.Model):
         self.seat_free_date = seat_free_date
         self.freeseat = freeseat
 
-    @staticmethod
-    def is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
-    	# if direction of trip does not match train direction, return False
-    	direction = Trips.get_trip_direction(start_station,end_station)
-    	train_direction = db.session.query(Trains.train_direction).filter_by(train_id = train_id).first()
-    	if train_direction:
-    		if direction != train_direction[0]:
-    			return False
-    	if not train_direction:
-    		return False
-    	# if northbound, set start_station to seg_n_end and end_station to seg_s_end
-    	if direction == 1:
-    		seg_n_end = start_station
-    		seg_s_end = end_station
-    	# else, flip it
-    	else:
-    		seg_n_end = end_station
-    		seg_s_end = start_station
-    	# for every segment between seg_n_end and seg_s_end:
-    	for i in range(seg_n_end,seg_s_end):
-    		# query the segments table to get the segment id of that segment
-    		segment = Segment.get_segment(i)
-    		# check if there is at least 1 empty seat for that trip
-    		if db.session.query(SeatsFree.freeseat).filter_by(train_id = train_id, segment_id = segment, seat_free_date = seat_free_date).first()[0] < 1:
-    			return False
-    	# return True
-    	return True
 
 class Segment(db.Model):
     """
@@ -155,6 +128,67 @@ class Trains(db.Model):
         self.train_end = train_end
         self.train_direction = train_direction
         self.train_days = train_days
+
+    @staticmethod
+    def get_all_train_ids():
+    	trains_query = db.session.query(Trains.train_id).all()
+    	trains = []
+    	for train in trains_query:
+    		trains.append(train[0])
+    	trains.sort()
+    	return trains
+
+    @staticmethod
+    def is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+    	# if direction of trip does not match train direction, return False
+    	direction = Trips.get_trip_direction(start_station,end_station)
+    	train_direction = db.session.query(Trains.train_direction).filter_by(train_id = train_id).first()
+    	if train_direction:
+    		if direction != train_direction[0]:
+    			return False
+    	if not train_direction:
+    		return False
+    	# if northbound, set start_station to seg_n_end and end_station to seg_s_end
+    	if direction == 1:
+    		seg_n_end = start_station
+    		seg_s_end = end_station
+    	# else, flip it
+    	else:
+    		seg_n_end = end_station
+    		seg_s_end = start_station
+    	# check if train is in seats_free table
+    	if db.session.query(SeatsFree).filter_by(train_id = train_id, seat_free_date=seat_free_date).count() == 0:
+    		return False
+    	# for every segment between seg_n_end and seg_s_end:
+    	for i in range(seg_n_end,seg_s_end):
+    		# query the segments table to get the segment id of that segment
+    		segment = Segment.get_segment(i)
+    		# check if there is at least 1 empty seat for that trip
+    		if db.session.query(SeatsFree.freeseat).filter_by(train_id = train_id, segment_id = segment, seat_free_date = seat_free_date).first()[0] < 1:
+    			return False
+    	# return True
+    	return True
+
+    @staticmethod
+    def get_available_trains(start_station,end_station,seat_free_date):
+    	trains = Trains.get_all_train_ids()
+    	available_trains = []
+    	for train_id in trains:
+    		if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+    			time_in = str(Trains.get_train_time_in(train_id,start_station))
+    			time_out = str(Trains.get_train_time_out(train_id,end_station))
+    			available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out})
+    	return available_trains
+
+    @staticmethod
+    def get_train_time_in(train_id, station_id):
+    	time_in = db.session.query(StopsAt.time_in).filter_by(train_id = train_id, station_id=station_id).first()[0]
+    	return time_in
+
+    @staticmethod
+    def get_train_time_out(train_id, station_id):
+    	time_out = db.session.query(StopsAt.time_out).filter_by(train_id = train_id, station_id=station_id).first()[0]
+    	return time_out
 
 class Trips(db.Model):
     """
