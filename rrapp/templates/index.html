@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="section">
-	{{ resID }}
+{% if not session['user'] %}
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+      Sign Up For an Account
+    </h1>
+  </div>
 </div>
+{% endif %}
 {% endblock %}

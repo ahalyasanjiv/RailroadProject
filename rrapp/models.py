@@ -88,6 +88,26 @@ class Reservation(db.Model):
         reservation_id = db.session.query(Reservation.reservation_id).filter_by(reservation_date = reservation_date, paying_passenger_id=paying_passenger_id).first()[0]
         return reservation_id
 
+    @staticmethod
+    def get_passenger_reservations(passenger_id):
+        reservation_query = db.session.query(Reservation.reservation_id).filter_by(paying_passenger_id=passenger_id).all()
+        reservations = []
+        if reservation_query != None:
+            for reservation in reservation_query:
+                reservations.append(Reservation.get_reservation_info(reservation[0]))
+        return reservations
+
+    @staticmethod
+    def get_reservation_info(reservation_id):
+        reservation = db.session.query(Reservation).filter_by(reservation_id=reservation_id).first()
+        return {
+            'reservation_id':reservation.reservation_id,
+            'passenger_id':reservation.paying_passenger_id,
+            'reservation_date':str(reservation.reservation_date)[:19]
+        }
+
+
+
 class SeatsFree(db.Model):
     """
     Table that stores seatsFree

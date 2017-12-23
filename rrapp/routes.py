@@ -106,6 +106,14 @@ def confirmReservation():
 		session.pop('trip_info', None)
 		return redirect(url_for('index'))
 	
+@app.route('/viewreservations', methods=['GET','POST'])
+def viewReservations():
+	if 'user' not in session:
+		return render_template('index.html')
+	else:
+		passenger_info = Passenger.get_passenger_info(session['user'])
+		reservations = Reservation.get_passenger_reservations(passenger_info['passenger_id'])
+		return render_template('viewreservations.html', reservations=reservations)
 
 
 

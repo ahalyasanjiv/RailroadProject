@@ -14,22 +14,17 @@
 	<nav class="navbar is-dark" style="background-color:#800000" role="navigation">
 		<div class="container">
 			<div class="logo">
-				<a class="navbar-brand" href="/"><div class='navbar-item'>AvocadoRails</div></a>
+				<a class="navbar-brand" href="{{ url_for('index') }}"><div class='navbar-item'>AvocadoRails</div></a>
 			</div>
 			<div class="navbar-menu">
 				<div class="navbar-start">
-					<a class="navbar-item" href="/">Home</a>
 					<a class="navbar-item" href="{{ url_for('chooseTrip') }}">Make a Reservation</a>
-					<a class="navbar-item" href="/">View Reservation</a>
+					<a class="navbar-item" href="{{ url_for('viewReservations') }}">View Reservations</a>
 				</div>
 				<div class="navbar-end">
 					
 					{% if session['user'] %}
-					<!-- <div id="user-icon"> -->
-						<!-- <img src=""> -->
 						<a class="navbar-item" href="{{ url_for('logout') }}">Log Out</a>
-
-					<!-- </div> -->
 					{% else %}
 					<a class="navbar-item" href="{{ url_for('signup') }}">Sign Up</a>
 					<a class="navbar-item" href="{{ url_for('login') }}">Log In</a>
