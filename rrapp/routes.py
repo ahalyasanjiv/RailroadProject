@@ -158,8 +158,25 @@ def modifyReservation():
 
 @app.route("/cancelreservation", methods=["GET", "POST"])
 def cancelReservation():
-    reservation_id_to_cancel = session.get("reservation_id_to_cancel", None)
-    reservation = Reservation.get_reservation_info(reservation_id_to_cancel)
-    trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_cancel)
-    session.pop("reservation_id_to_cancel", None)
-    return render_template("cancelreservation.html", reservation=reservation, trip_info=trip_info)
+    if "user" not in session:
+        return render_template("index.html")
+    elif request.method == "POST":
+        if request.form["action"] == "Yes":
+            #Actually cancel reservation
+            reservation_id_to_cancel = request.form["reservation_id_to_cancel_for_real"]
+            #Delete from database the reservation and the trip
+            trip = db.session.query(Trips).filter_by(reservation_id=reservation_id_to_cancel).first()
+            reservation = db.session.query(Reservation).filter_by(reservation_id=reservation_id_to_cancel).first()
+            db.session.delete(trip)
+            db.session.delete(reservation)
+            db.session.commit()
+            #Somewhere probably need to make seat free again
+            return redirect(url_for("viewReservations"))
+        elif request.form["action"] == "No":
+            return redirect(url_for("viewReservations"))
+    else:
+        reservation_id_to_cancel = session.get("reservation_id_to_cancel", None)
+        reservation = Reservation.get_reservation_info(reservation_id_to_cancel)
+        trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_cancel)
+        session.pop("reservation_id_to_cancel", None)
+        return render_template("cancelreservation.html", reservation=reservation, trip_info=trip_info)
