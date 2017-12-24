@@ -223,6 +223,7 @@ def modifyReservation():
 
             db.session.query(Trips).filter_by(reservation_id=reservation_id_to_modify).update({"trip_date":trip_date, 
                 "trip_seg_start":start_station, "trip_seg_ends":end_station, "fare":total_fare, "trip_train_id":train_id})
+            db.session.commit()
             session.pop("confirm_reservation", None)
             return redirect(url_for("viewReservations"))
     else:
