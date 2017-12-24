@@ -23,7 +23,7 @@
 		<div class="notifs notification is-dark">
 			<div class="has-text-centered">
 				<p> Are you sure you want to cancel this reservation?</p>
-					<form method="post">
+					<form action="/cancelreservation" method="post">
 						<input class="button is-danger" type="submit" name="action" value="Yes"></input>
 						<input class="button is-info" type="submit" name="action" value="No"></input>
 						<input type="hidden" name="reservation_id_to_cancel_for_real" value="{{ reservation.reservation_id }}"></input>

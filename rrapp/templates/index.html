@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 {% if not session['user'] %}
-<div class="hero-body">
-  <div class="container">
-    <h1 class="title">
-      Sign Up For an Account
-    </h1>
-  </div>
+<div class="hero is-fullheight">
+	<div class="hero-body">
+	  <div class="container has-text-centered">
+	    <h1 class="title">
+	      Take a ride on the AvocadoRails!
+	    </h1>
+	    <a class='button is-large is-dark' href="/reserve">Search For a Ride</a>
+	  </div>
+	</div>
 </div>
 {% endif %}
 {{ testval }}
