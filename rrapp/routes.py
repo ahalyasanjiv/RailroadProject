@@ -144,10 +144,11 @@ def viewReservations():
     elif request.method == "POST":
         #Modify reservation
         if request.form["action"] == "Modify":
+            session["reservation_id_to_modify"] = request.form["reservation_id_to_act_on"]
             return redirect(url_for("modifyReservation"))
         #Cancel Reservation
         elif request.form["action"] == "Cancel":
-            session["reservation_id_to_cancel"] = request.form["reservation_id_to_cancel"]
+            session["reservation_id_to_cancel"] = request.form["reservation_id_to_act_on"]
             return redirect(url_for("cancelReservation")) 
     else:
         passenger_info = Passenger.get_passenger_info(session['user'])
@@ -159,7 +160,14 @@ def viewReservations():
 
 @app.route("/modifyreservation", methods=["GET", "POST"])
 def modifyReservation():
-    return render_template("index.html")
+    if "user" not in session:
+        return render_template("index.html")
+    else:
+        reservation_id_to_modify = session.get("reservation_id_to_modify", None)
+        reservation = Reservation.get_reservation_info(reservation_id_to_modify)
+        trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_modify)
+        session.pop("reservation_id_to_modify", None)
+        return render_template("modifyreservation.html", reservation=reservation, trip_info=trip_info)
 
 @app.route("/cancelreservation", methods=["GET", "POST"])
 def cancelReservation():
