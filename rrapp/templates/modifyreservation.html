@@ -15,26 +15,155 @@
 
 <div class="section" id="view-reservations">
 	<div class="columns">
-	<div class="column is-one-third"></div>
-	<div class="column is-one-third">
-	{% if not session['user'] %}
-		<h1 class='title'>Create an account or login to make reservations</h1>
-	{% else %}
-		<div class="notifs notification is-dark">
-			<p>Currently modifying</p>
-			<br>
-			<p>Reservation Number: {{ reservation.reservation_id }}</p>
-			<p>Reservation Date: {{ reservation.reservation_date }}</p>
-			<br>
-			<p>Trip Date: {{ trip_info["trip_date"] }}</p>
-			<p>Start Station: {{ trip_info["start_station"] }}</p>
-			<p>Arrival Time: {{ trip_info["arrival_time"] }}</p>
-			<p>Departure Time: {{ trip_info["departure_time"] }}</p>
-			<p>End Station: {{ trip_info["end_station"] }}</p>
+		<div class="column is-one-third"></div>
+			<div class="column is-one-third">
+			{% if not session['user'] %}
+				<h1 class='title'>Create an account or login to make reservations</h1>
+			{% else %}
+			<div class="notifs notification is-dark">
+				<p>Currently modifying:</p>
+				<br>
+				<p>Reservation Number: {{ reservation.reservation_id }}</p>
+				<p>Reservation Date: {{ reservation.reservation_date }}</p>
+				<br>
+				<p>Trip Date: {{ trip_info["trip_date"] }}</p>
+				<p>Start Station: {{ trip_info["start_station"] }}</p>
+				<p>Arrival Time: {{ trip_info["arrival_time"] }}</p>
+				<p>Departure Time: {{ trip_info["departure_time"] }}</p>
+				<p>End Station: {{ trip_info["end_station"] }}</p>
+			</div>
+		{% endif %}
 		</div>
-	{% endif %}
-	</div>
 	</div>
 </div>
+
+{% if session["choose_date_and_stations"] %}
+	<div class="container">
+		<div class="columns">
+			<div class="column is-10 is-offset-1 box">
+			<form action="#" method="POST">
+				<div class="field is-grouped is-grouped-centered">
+					<div class="control is-expanded">
+						<div class="label">{{ form.start_station.label }}</div>
+						{{ form.start_station(class_="select is-large") }}
+						{% if form.start_station.errors %}
+	            			{% for error in form.start_station.errors %}
+	              				<p class="is-danger">{{ error }}</p>
+	            			{% endfor %}
+	        			{% endif %}
+					</div>
+					<div class="control is-expanded">
+						<div class="label">{{ form.end_station.label }}</div>
+						{{ form.end_station(class_="select is-large") }}
+						{% if form.end_station.errors %}
+	            			{% for error in form.end_station.errors %}
+	              				<p class="is-danger">{{ error }}</p>
+	            			{% endfor %}
+	        			{% endif %}
+					</div>
+
+				</div>
+				<div class="field">
+					<div class="control">
+							<div class="label">{{ form.date.label }}</div>
+							{{ form.date(class_="input is-large", placeholder="yyyy-mm-dd", type="date") }}
+							{% if form.date.errors %}
+		            			{% for error in form.date.errors %}
+		              				<p class="is-danger">{{ error }}</p>
+		            			{% endfor %}
+		        			{% endif %}
+						</div>
+				</div>
+				<div class="field has-text-centered">
+					{{ form.submit(class_="button is-dark is-large") }}
+				</div>
+			</form>
+		</div>
+	</div>
+	<br>
+{% endif %}
+
+{% if session["choose_train"] %}
+<div class ="hero-body">
+	<div class="container ">
+		<div class="columns">
+			<div class="column is-one-quarter">
+			</div>
+			<div class="column is-half">
+				<h2 class="title is-1 has-text-centered">
+		        	Choose a Train
+		   		</h2>
+		    <h2 class="subtitle is-3 has-text-centered"></h2>
+		    {% with messages = get_flashed_messages() %}
+	          {% if messages %}
+	            <div class=flashes>
+	              {% for message in messages %}
+	                {{ message }}
+	              {% endfor %}
+	            </div>
+	          {% endif %}
+	        {% endwith %}
+		    <form action="#" method="POST">
+		    	<input type="radio" name="train" value=-1 style="visibility: hidden;" checked/>
+		    {% if available_trains %}
+			    {% for train in available_trains %}
+			    	<div class="notification is-dark">
+						<input type="radio" name="train" value={{ train.train_id }} class="is-pulled-right">
+					  	<h2 class="title is-4">Train {{ train.train_id }}</h2>
+					  	<h2 class="subtitle is-5">{{ train.time_in }}&emsp;&#8658;&emsp;{{ train.time_out }}</h2>
+					</div>
+			    {% endfor %}
+			    			<input type="submit" name="submit" id="chooseReservation" value="Confirm Reservation" class="button is-dark">
+			</form>
+			  {% else %}
+
+			  <p class="content">No trains available at this time.</p>
+			  {% endif %}
+
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+{% if session["confirm_reservation"] %}
+<div class ="hero-body">
+	<div class="container">
+		<div class="columns">
+			<div class="column is-one-quarter">
+			</div>
+			<div class="column is-half">
+		    {% with messages = get_flashed_messages() %}
+	          {% if messages %}
+	            <div class=flashes>
+	              {% for message in messages %}
+	                {{ message }}
+	              {% endfor %}
+	            </div>
+	          {% endif %}
+	        {% endwith %}
+	        <p>There is an ${{ modifyFee }} fee for modifying. Are you sure you want to modify your reservation?</p>
+		    <form action="#" method="POST">
+		    <div class="notification">
+		    	<div class="columns">
+				<div class="column is-one-third"></div>
+				<div class="column is-one-third">
+		    	<p><strong>Start Station:</strong> {{ new_trip_info.start_station}}</p>
+		    	<p><strong>End Station:</strong> {{ new_trip_info.end_station}}</p>
+		    	<p><strong>Trip Date:</strong> {{ new_trip_info.trip_date}}</p>
+		    	<p><strong>Train Number:</strong> {{ new_trip_info.train_id}}</p>
+		    	<p><strong>Departure:</strong> {{ new_trip_info.time_in}}</p>
+		    	<p><strong>Arrival:</strong> {{ new_trip_info.time_out}}</p>
+		    	<p><strong>Total Fare:</strong> ${{ new_trip_info.total_fare}}</p><br>
+				<input type="submit" name="submit" id="confirmReservation" value="Confirm Reservation" style="background-color:#800000;" class="button is-dark">
+				</div>
+				</div>
+			</div>
+			</form>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
 
 {% endblock %}
