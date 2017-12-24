@@ -228,11 +228,12 @@ class Trains(db.Model):
         trains = Trains.get_all_train_ids()
         available_trains = []
         for train_id in trains:
-            if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
-                time_in = str(Trains.get_train_time_in(train_id,start_station))
-                time_out = str(Trains.get_train_time_in(train_id,end_station))
-                total_fare = Trips.get_trip_fare(start_station,end_station)
-                available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out,'total_fare':total_fare})
+            if train_id <= 25:
+                if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
+                    time_in = str(Trains.get_train_time_in(train_id,start_station))
+                    time_out = str(Trains.get_train_time_in(train_id,end_station))
+                    total_fare = Trips.get_trip_fare(start_station,end_station)
+                    available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out,'total_fare':total_fare})
         return available_trains
     @staticmethod
     def get_train_time_in(train_id, station_id):
