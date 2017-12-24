@@ -154,7 +154,7 @@ def viewReservations():
 
 @app.route("/modifyreservation", methods=["GET", "POST"])
 def modifyReservation():
-    return render_template("index.html")
+    return render_template("modifyreservation.html")
 
 @app.route("/cancelreservation", methods=["GET", "POST"])
 def cancelReservation():

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if session['user'] %}
+<section class="hero is-dark">
+<div class="hero-body">
+	<div class="container">
+		<h1 class="title">
+			Modify A Reservation
+		</h1>
+	</div>
+</div>
+</section>
+{% endif %}
+
+{% endblock %}
