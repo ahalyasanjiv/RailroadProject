@@ -251,17 +251,17 @@ class Trips(db.Model):
     __tablename__ = "trips"
     trip_id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     trip_date = db.Column(db.Date, nullable=False)
-    trip_seg_start = db.Column(db.Integer, db.ForeignKey("segments.segment_id"), nullable=False)
-    trip_seg_ends = db.Column(db.Integer, db.ForeignKey("segments.segment_id"), nullable=False)
+    trip_start_station = db.Column(db.Integer, db.ForeignKey("stations.station_id"), nullable=False)
+    trip_end_station = db.Column(db.Integer, db.ForeignKey("stations.station_id"), nullable=False)
     fare_type = db.Column(db.Integer, db.ForeignKey("fare_types.fare_id"), nullable=False)
     fare = db.Column(db.Numeric(7,2), nullable=False)
     trip_train_id = db.Column(db.Integer, db.ForeignKey("trains.train_id"), nullable=False)
     reservation_id = db.Column(db.Integer, db.ForeignKey("reservations.reservation_id"), nullable=False)
 
-    def __init__(self, trip_date, trip_seg_start, trip_seg_ends, fare_type, fare, trip_train_id, reservation_id):
+    def __init__(self, trip_date, trip_start_station, trip_end_station, fare_type, fare, trip_train_id, reservation_id):
         self.trip_date = trip_date
-        self.trip_seg_start = trip_seg_start
-        self.trip_seg_ends = trip_seg_ends
+        self.trip_start_station = trip_start_station
+        self.trip_end_station = trip_end_station
         self.fare_type = fare_type
         self.fare = fare
         self.trip_train_id = trip_train_id
@@ -293,8 +293,8 @@ class Trips(db.Model):
         info = {}
         if (db.session.query(Trips.trip_date).filter_by(reservation_id=reservation_id).first()):
             info["trip_date"] = str(db.session.query(Trips.trip_date).filter_by(reservation_id=reservation_id).first()[0])
-            info["start_station"] = db.session.query(Trips.trip_seg_start).filter_by(reservation_id=reservation_id).first()[0]
-            info["end_station"] = db.session.query(Trips.trip_seg_ends).filter_by(reservation_id=reservation_id).first()[0]
+            info["start_station"] = db.session.query(Trips.trip_start_station).filter_by(reservation_id=reservation_id).first()[0]
+            info["end_station"] = db.session.query(Trips.trip_end_station).filter_by(reservation_id=reservation_id).first()[0]
             # train_id and station_id used to get arrival and departue time of the train rode on the trip
             train_id = db.session.query(Trips.trip_train_id).filter_by(reservation_id=reservation_id).first()[0]
             info["train_id"] = train_id

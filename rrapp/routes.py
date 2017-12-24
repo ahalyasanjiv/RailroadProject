@@ -172,6 +172,7 @@ def modifyReservation():
             reservation_id_to_modify = session.get("reservation_id_to_modify", None)
             reservation = Reservation.get_reservation_info(reservation_id_to_modify)
             trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_modify)
+            session["old_trip_info"] = {"train_id":trip_info["train_id"],"start_station":trip_info["start_station"],"end_station":trip_info["end_station"],"trip_date":trip_info["trip_date"]}
             #session.pop("reservation_id_to_modify", None)
             start = form.start_station.data
             end = form.end_station.data
@@ -182,6 +183,7 @@ def modifyReservation():
             session["start_station"] = start_station
             session["end_station"] = end_station
             session["trip_date"] = trip_date
+            session["train_id"] = trip_info["train_id"]
             session.pop("choose_date_and_stations", None)
             session["choose_train"] = True
             return render_template("modifyreservation.html", reservation=reservation, trip_info=trip_info, available_trains=available_trains, start_station=start_station, end_station=end_station, trip_date=trip_date)
@@ -219,10 +221,17 @@ def modifyReservation():
             trip_date = session["new_trip_info"]["trip_date"]
             time_in = session["new_trip_info"]["time_in"]
             time_out = session["new_trip_info"]["time_out"]
+            #Free up old seats in seats_free table for old trip
+            if "old_trip_info" in session:
+            	SeatsFree.change_freeseat(session["old_trip_info"]["train_id"],session["old_trip_info"]["start_station"],session["old_trip_info"]["end_station"],session["old_trip_info"]["trip_date"],1)
+            	session.pop("old_trip_info", None)	
+            #Decrement seats in seats_free table for new trip
+            SeatsFree.change_freeseat(session["new_trip_info"]["train_id"],session["new_trip_info"]["start_station"],session["new_trip_info"]["end_station"],session["new_trip_info"]["trip_date"],-1)
+
             session.pop("new_trip_info", None)
 
             db.session.query(Trips).filter_by(reservation_id=reservation_id_to_modify).update({"trip_date":trip_date, 
-                "trip_seg_start":start_station, "trip_seg_ends":end_station, "fare":total_fare, "trip_train_id":train_id})
+                "trip_start_station":start_station, "trip_end_station":end_station, "fare":total_fare, "trip_train_id":train_id})
             db.session.commit()
             session.pop("confirm_reservation", None)
             return redirect(url_for("viewReservations"))
