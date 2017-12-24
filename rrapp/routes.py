@@ -15,7 +15,7 @@ app.secret_key = 'development-key'
 
 @app.route('/', methods=['GET','POST'])
 def index():
-    return render_template('index.html')
+	return render_template('index.html')
 
 @app.route('/signup/', methods=['GET', 'POST'])
 def signup():
@@ -92,9 +92,10 @@ def reserve():
 @app.route('/choosetrip/<start_station>/<end_station>/<trip_date>', methods=['GET','POST'])
 def chooseTrip(start_station,end_station,trip_date):
     if 'user' not in session:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     start_station=int(start_station)
     end_station=int(end_station)
+    trip_date='2017-11-13'
     available_trains = Trains.get_available_trains(start_station,end_station,trip_date)
     if request.method ==  'GET':
         return render_template('choosetrip.html',available_trains=available_trains,start_station=start_station, end_station=end_station, trip_date=trip_date)
@@ -121,12 +122,16 @@ def confirmReservation():
     if request.method == 'GET':
         return render_template('confirmreservation.html',trip_info=trip_info)
     else:
+    	#Create a new reservation
         passenger_info = Passenger.get_passenger_info(session['user'])
         reservation_date = func.now()
         newReservation = Reservation(reservation_date, passenger_info['passenger_id'], passenger_info['card_number'], passenger_info['billing_address'])
         db.session.add(newReservation)
+        #Create a new trip
         reservation_id = Reservation.get_reservation_id(reservation_date, passenger_info['passenger_id'])
         newTrip = Trips(trip_date, start_station, end_station, 1, total_fare, int(train_id), reservation_id)
+        #Modify number of freeseats
+        SeatsFree.change_freeseat(train_id,start_station,end_station,trip_date,-1)
         db.session.add(newTrip)
         db.session.commit()
         session.pop('trip_info', None)
@@ -243,10 +248,15 @@ def cancelReservation():
             #Delete from database the reservation and the trip
             trip = db.session.query(Trips).filter_by(reservation_id=reservation_id_to_cancel).first()
             reservation = db.session.query(Reservation).filter_by(reservation_id=reservation_id_to_cancel).first()
+            trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_cancel)
+            #Free up the seat
+            SeatsFree.change_freeseat(trip_info["train_id"],trip_info["start_station"],trip_info["end_station"],trip_info["trip_date"],1)
+            
             db.session.delete(trip)
+            db.session.commit()
             db.session.delete(reservation)
             db.session.commit()
-            #Somewhere probably need to make seat free again
+
             return redirect(url_for("viewReservations"))
         elif request.form["action"] == "No":
             return redirect(url_for("viewReservations"))

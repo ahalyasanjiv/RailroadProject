@@ -126,6 +126,25 @@ class SeatsFree(db.Model):
         self.seat_free_date = seat_free_date
         self.freeseat = freeseat
 
+    @staticmethod
+    def change_freeseat(train_id,start_station,end_station,trip_date,change):
+        # Get the northmost station and southmost station of the trip
+        if start_station > end_station:
+            seg_n_end = end_station
+            seg_s_end = start_station
+        else:
+            seg_n_end = start_station
+            seg_s_end = end_station
+        # For each segment, change the number of free seats
+        for i in range(seg_n_end,seg_s_end):
+            altered_freeseat_number = db.session.query(SeatsFree.freeseat).filter_by(train_id=train_id, segment_id=i, seat_free_date=trip_date).first()[0] + change
+            db.session.query(SeatsFree).filter_by(train_id=train_id, segment_id=i, seat_free_date=trip_date).update({'freeseat': altered_freeseat_number})
+
+        db.session.commit()
+
+            
+
+
 
 class Segment(db.Model):
     """
@@ -211,7 +230,7 @@ class Trains(db.Model):
         for train_id in trains:
             if Trains.is_train_free_for_trip(train_id,start_station,end_station,seat_free_date):
                 time_in = str(Trains.get_train_time_in(train_id,start_station))
-                time_out = str(Trains.get_train_time_out(train_id,end_station))
+                time_out = str(Trains.get_train_time_in(train_id,end_station))
                 total_fare = Trips.get_trip_fare(start_station,end_station)
                 available_trains.append({'train_id':train_id,'time_in':time_in,'time_out':time_out,'total_fare':total_fare})
         return available_trains
@@ -272,15 +291,17 @@ class Trips(db.Model):
     @staticmethod
     def get_trip_info_from_reservation_id(reservation_id):
         info = {}
-        info["trip_date"] = str(db.session.query(Trips.trip_date).filter_by(reservation_id=reservation_id).first()[0])
-        info["start_station"] = db.session.query(Trips.trip_seg_start).filter_by(reservation_id=reservation_id).first()[0]
-        info["end_station"] = db.session.query(Trips.trip_seg_ends).filter_by(reservation_id=reservation_id).first()[0]
-        # train_id and station_id used to get arrival and departue time of the train rode on the trip
-        train_id = db.session.query(Trips.trip_train_id).filter_by(reservation_id=reservation_id).first()[0]
-        station_id = db.session.query(StopsAt.station_id).filter_by(train_id=train_id).first()[0]
-        info["arrival_time"] = str(db.session.query(StopsAt.time_in).filter_by(train_id = train_id, station_id=station_id).first()[0])
-        info["departure_time"] = str(db.session.query(StopsAt.time_out).filter_by(train_id = train_id, station_id=station_id).first()[0])
-        return info
+        if (db.session.query(Trips.trip_date).filter_by(reservation_id=reservation_id).first()):
+            info["trip_date"] = str(db.session.query(Trips.trip_date).filter_by(reservation_id=reservation_id).first()[0])
+            info["start_station"] = db.session.query(Trips.trip_seg_start).filter_by(reservation_id=reservation_id).first()[0]
+            info["end_station"] = db.session.query(Trips.trip_seg_ends).filter_by(reservation_id=reservation_id).first()[0]
+            # train_id and station_id used to get arrival and departue time of the train rode on the trip
+            train_id = db.session.query(Trips.trip_train_id).filter_by(reservation_id=reservation_id).first()[0]
+            info["train_id"] = train_id
+            station_id = db.session.query(StopsAt.station_id).filter_by(train_id=train_id).first()[0]
+            info["arrival_time"] = str(db.session.query(StopsAt.time_in).filter_by(train_id = train_id, station_id=station_id).first()[0])
+            info["departure_time"] = str(db.session.query(StopsAt.time_out).filter_by(train_id = train_id, station_id=station_id).first()[0])
+            return info
 
 
 class Station(db.Model):
