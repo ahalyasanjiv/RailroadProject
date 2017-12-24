@@ -140,6 +140,7 @@ def viewReservations():
             return redirect(url_for("modifyReservation"))
         #Cancel Reservation
         elif request.form["action"] == "Cancel":
+            session["reservation_id_to_cancel"] = request.form["reservation_id_to_cancel"]
             return redirect(url_for("cancelReservation")) 
     else:
         passenger_info = Passenger.get_passenger_info(session['user'])
@@ -155,4 +156,8 @@ def modifyReservation():
 
 @app.route("/cancelreservation", methods=["GET", "POST"])
 def cancelReservation():
-    return render_template("index.html")
+    reservation_id_to_cancel = session.get("reservation_id_to_cancel", None)
+    reservation = Reservation.get_reservation_info(reservation_id_to_cancel)
+    trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_cancel)
+    session.pop("reservation_id_to_cancel", None)
+    return render_template("cancelreservation.html", reservation=reservation, trip_info=trip_info)

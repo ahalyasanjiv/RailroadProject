@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+{% if session['user'] %}
+<section class="hero is-dark">
+<div class="hero-body">
+	<div class="container">
+		<h1 class="title">
+			Cancel A Reservation
+		</h1>
+	</div>
+</div>
+</section>
+{% endif %}
+
+<div class="section" id="view-reservations">
+	<div class="columns">
+	<div class="column is-one-third"></div>
+	<div class="column is-one-third">
+	{% if not session['user'] %}
+	<h1 class='title'>Create an account or login to make reservations</h1>
+	{% else %}
+		<div class="notifs notification is-dark">
+			<div class="has-text-centered">
+				<p> Are you sure you want to cancel this reservation?</p>
+					<form method="post">
+						<input class="button is-danger" type="submit" name="action" value="Yes"></input>
+						<input class="button is-info" type="submit" name="action" value="No"></input>
+					</form>
+			</div>
+		</div>
+		<div class="notifs notification is-dark">
+			<p>Reservation Number: {{ reservation.reservation_id }}</p>
+			<p>Reservation Date: {{ reservation.reservation_date }}</p>
+			<br>
+			<p>Trip Date: {{ trip_info["trip_date"] }}</p>
+			<p>Start Station: {{ trip_info["start_station"] }}</p>
+			<p>Arrival Time: {{ trip_info["arrival_time"] }}</p>
+			<p>Departure Time: {{ trip_info["departure_time"] }}</p>
+			<p>End Station: {{ trip_info["end_station"] }}</p>
+		</div>
+	{% endif %}
+	</div>
+	</div>
+</div>
+
+{% endblock %}
