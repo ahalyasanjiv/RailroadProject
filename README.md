@@ -22,3 +22,7 @@ pip3 install -r requirements.txt
 ```
 python3 application.py
 ```
+
+## Database
+Running the application locally requires a local Postgresql database.
+The schema for the database is taken from Railroad1. However, modified data from the stops_at table from Railroad3 are used.
