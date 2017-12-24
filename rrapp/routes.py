@@ -184,7 +184,6 @@ def modifyReservation():
             reservation = Reservation.get_reservation_info(reservation_id_to_modify)
             trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_modify)
             session["old_trip_info"] = {"train_id":trip_info["train_id"],"start_station":trip_info["start_station"],"end_station":trip_info["end_station"],"trip_date":trip_info["trip_date"]}
-            #session.pop("reservation_id_to_modify", None)
             start = form.start_station.data
             end = form.end_station.data
             trip_date = form.date.data
@@ -203,7 +202,6 @@ def modifyReservation():
             reservation_id_to_modify = session.get("reservation_id_to_modify", None)
             reservation = Reservation.get_reservation_info(reservation_id_to_modify)
             trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_modify)
-            #session.pop("reservation_id_to_modify", None)
             start_station = session.get("start_station", None)
             session.pop("start_station", None)
             end_station = session.get("end_station", None)
@@ -224,7 +222,6 @@ def modifyReservation():
             reservation_id_to_modify = session.get("reservation_id_to_modify", None)
             #reservation = Reservation.get_reservation_info(reservation_id_to_modify)
             #trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_modify)
-            #session.pop("reservation_id_to_modify", None)
             start_station = session["new_trip_info"]["start_station"]
             end_station = session["new_trip_info"]["end_station"]
             train_id = session["new_trip_info"]["train_id"]
@@ -244,15 +241,13 @@ def modifyReservation():
             db.session.query(Trips).filter_by(reservation_id=reservation_id_to_modify).update({"trip_date":trip_date, 
                 "trip_start_station":start_station, "trip_end_station":end_station, "fare":total_fare, "trip_train_id":train_id})
             db.session.commit()
+            session.pop("reservation_id_to_modify", None)
             session.pop("confirm_reservation", None)
             return redirect(url_for("viewReservations"))
     else:
         reservation_id_to_modify = session.get("reservation_id_to_modify", None)
         reservation = Reservation.get_reservation_info(reservation_id_to_modify)
         trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_modify)
-        #session.pop("reservation_id_to_modify", None)
-        #not popping because if a person refreshes the page we want to be able to have reservation_id_to_modify there
-        #if we popped, refreshing the page would raise an attribute error
         session.pop("choose_train", None)
         session.pop("confirm_reservation", None)
         session["choose_date_and_stations"] = True
@@ -277,15 +272,14 @@ def cancelReservation():
             db.session.commit()
             db.session.delete(reservation)
             db.session.commit()
-
+            session.pop("reservation_id_to_cancel", None)
             return redirect(url_for("viewReservations"))
+
         elif request.form["action"] == "No":
+            session.pop("reservation_id_to_cancel", None)
             return redirect(url_for("viewReservations"))
     else:
         reservation_id_to_cancel = session.get("reservation_id_to_cancel", None)
         reservation = Reservation.get_reservation_info(reservation_id_to_cancel)
         trip_info = Trips.get_trip_info_from_reservation_id(reservation_id_to_cancel)
-        #session.pop("reservation_id_to_cancel", None)
-        #not popping because if a person refreshes the page we want to be able to have reservation_id_to_cancel there
-        #if we popped, refreshing the page would raise an attribute error
         return render_template("cancelreservation.html", reservation=reservation, trip_info=trip_info)
