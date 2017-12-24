@@ -156,6 +156,13 @@ def viewReservations():
         trip_info = {}
         for reservation in reservations:
             trip_info[reservation["reservation_id"]] = Trips.get_trip_info_from_reservation_id(reservation["reservation_id"])
+            today = datetime.date.today()
+            #print(today)
+            #print(datetime.datetime.strptime(trip_info[reservation["reservation_id"]]["trip_date"],"%Y-%m-%d"))
+            if datetime.datetime.strptime(trip_info[reservation["reservation_id"]]["trip_date"],"%Y-%m-%d").date() < today:
+                trip_info[reservation["reservation_id"]]["active"] = False
+            else:
+                trip_info[reservation["reservation_id"]]["active"] = True
         return render_template('viewreservations.html', reservations=reservations, trip_info=trip_info)
 
 @app.route("/modifyreservation", methods=["GET", "POST"])
