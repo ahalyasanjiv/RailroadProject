@@ -92,7 +92,7 @@ def reserve():
 @app.route('/choosetrip/<start_station>/<end_station>/<trip_date>', methods=['GET','POST'])
 def chooseTrip(start_station,end_station,trip_date):
     if 'user' not in session:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     start_station=int(start_station)
     end_station=int(end_station)
     available_trains = Trains.get_available_trains(start_station,end_station,trip_date)
