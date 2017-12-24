@@ -80,12 +80,14 @@ def reserve():
     if request.method == "GET":
         return render_template("reserve.html",form=form)
     elif request.method == "POST":
-        start = form.start_station.data
-        end = form.end_station.data
-        date= form.date.data
+        if form.date.validate(form):
+            start = form.start_station.data
+            end = form.end_station.data
+            date= form.date.data
 
-        return redirect(url_for('chooseTrip', start_station=start, end_station=end, trip_date=date))
-
+            return redirect(url_for('chooseTrip', start_station=start, end_station=end, trip_date=date))
+        else:
+            return render_template("reserve.html",form=form)
 
 @app.route('/choosetrip/<start_station>/<end_station>/<trip_date>', methods=['GET','POST'])
 def chooseTrip(start_station,end_station,trip_date):
