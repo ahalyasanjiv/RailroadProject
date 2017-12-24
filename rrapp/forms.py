@@ -11,6 +11,13 @@ def validate_email(form,field):
 		return False
 	return True
 
+def validate_date(form,field):
+	#print(field.data)
+	if field.data < datetime.today().date():
+		raise ValidationError("Please choose a valid date.")
+		return False
+	return True
+
 class SignupForm(FlaskForm):
 	first_name = StringField('First name', validators=[DataRequired('Please enter your first name.')])
 	last_name = StringField('Last name', validators=[DataRequired('Please enter your last name.')])
@@ -29,5 +36,5 @@ class LoginForm(FlaskForm):
 class ReservationForm(FlaskForm):
 	start_station = SelectField(label="Departure", id="start_station", choices=[(1, 'Boston, MA - South Station'), (2, 'Boston, MA - Back Bay Station'), (3, 'Route 128, MA'), (4, 'Providence, RI'), (5, 'Kingston, RI'), (6, 'Westerly,RI'), (7, 'Mystic, CT'), (8, 'New London, CT'), (9, 'Old Saybrook, CT'), (10, 'New Haven, CT'), (11, 'Bridgeport, CT'), (12, 'Stamford, CT'), (13, 'New Rochelle, NY'), (14, 'New York, NY - Penn Station'), (15, 'Newark, NJ'), (16, 'Newark Liberty Intl. Air., NJ'), (17, 'Metro Park, NJ'), (18, 'Trenton, NJ'), (19, 'Philadelphia, PA - 30th Street Station'), (20, 'Wilmington, DE - J.R. Biden, Jr. Station'), (21, 'Aberdeen, MD'), (22, 'Baltimore, MD - Penn Station'), (23, 'BWI Marshall Airport, MD'), (24, 'New Carrollton, MD'), (25, 'Washington, DC - Union Station')])
 	end_station = SelectField(label="Destination", id="end_station", choices=[(1, 'Boston, MA - South Station'), (2, 'Boston, MA - Back Bay Station'), (3, 'Route 128, MA'), (4, 'Providence, RI'), (5, 'Kingston, RI'), (6, 'Westerly,RI'), (7, 'Mystic, CT'), (8, 'New London, CT'), (9, 'Old Saybrook, CT'), (10, 'New Haven, CT'), (11, 'Bridgeport, CT'), (12, 'Stamford, CT'), (13, 'New Rochelle, NY'), (14, 'New York, NY - Penn Station'), (15, 'Newark, NJ'), (16, 'Newark Liberty Intl. Air., NJ'), (17, 'Metro Park, NJ'), (18, 'Trenton, NJ'), (19, 'Philadelphia, PA - 30th Street Station'), (20, 'Wilmington, DE - J.R. Biden, Jr. Station'), (21, 'Aberdeen, MD'), (22, 'Baltimore, MD - Penn Station'), (23, 'BWI Marshall Airport, MD'), (24, 'New Carrollton, MD'), (25, 'Washington, DC - Union Station')])
-	date = DateField(label="Depature Date", id="date", validators=[DataRequired('Please choose a date.')])
+	date = DateField(label="Depature Date", id="date", validators=[DataRequired('Please choose a date.'), validate_date])
 	submit = SubmitField("Search")

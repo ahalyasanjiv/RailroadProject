@@ -11,6 +11,17 @@
 	  </div>
 	</div>
 </div>
+{% else %}
+<div class="hero is-fullheight">
+	<div class="hero-body">
+	  <div class="container has-text-centered">
+	    <h1 class="title">
+	      Welcome back! Where will you go?
+	    </h1>
+	    <a class='button is-large is-dark' href="/reserve">Search For a Ride</a>
+	  </div>
+	</div>
+</div>
 {% endif %}
 {{ testval }}
 {% endblock %}
